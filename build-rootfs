@@ -9,6 +9,8 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+apt-get install -y debootstrap
+
 current_folder=$(dirname $0)
 build_folder=$current_folder/tmp
 bosh_blob=$current_folder/rootfs.tar.gz
@@ -17,14 +19,7 @@ assets_dir=$current_folder/warden
 
 mkdir -p $build_folder
 
-function apt_get {
-  local rootfs_dir=$1
-  shift
-  run_in_chroot $rootfs_dir "apt-get update"
-  run_in_chroot $rootfs_dir "apt-get -f -y --force-yes --no-install-recommends $@"
-  run_in_chroot $rootfs_dir "apt-get clean"
-}
-
+source $current_folder/helpers.sh
 
 gem install bundler --no-ri --no-rdoc
 
@@ -85,7 +80,10 @@ pushd $build_folder
     yes | rm -rf $rootfs_dir
   fi
 
-  git clone --depth 1 --branch power https://github.com/Altoros/warden.git
+  if [ ! -d warden ]
+  then
+    git clone --depth 1 --branch power https://github.com/Altoros/warden.git
+  fi
 
   pushd warden/warden
     # setup warden's default rootfs
