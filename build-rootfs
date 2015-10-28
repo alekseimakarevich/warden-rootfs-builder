@@ -18,6 +18,11 @@ assets_dir=$current_folder/warden
 
 mkdir -p $build_folder
 
+mount --bind /dev $rootfs_dir/dev
+mount --bind /dev/pts $rootfs_dir/dev/pts
+mount --bind /proc $rootfs_dir/proc/
+mount --bind /sys $rootfs_dir/sys
+
 source $current_folder/helpers.sh
 
 apt-get install -y debootstrap
